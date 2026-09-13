@@ -1,0 +1,58 @@
+[
+  {
+    "name": "climate",
+    "url": "http://localhost:8501",
+    "console_errors": [],
+    "page_errors": [],
+    "title_found": true,
+    "has_content": true,
+    "plotly_charts_rendered": 9,
+    "metric_cards_rendered": 6,
+    "filter_widgets_found": 12,
+    "filter_interaction_ok": "tag_removed (charts before=9, after=9)",
+    "narrow_viewport_ok": true,
+    "status": "PASS"
+  },
+  {
+    "name": "darkstore",
+    "url": "http://localhost:8502",
+    "console_errors": [],
+    "page_errors": [],
+    "title_found": true,
+    "has_content": true,
+    "plotly_charts_rendered": 12,
+    "metric_cards_rendered": 6,
+    "filter_widgets_found": 8,
+    "filter_interaction_ok": "tag_removed (charts before=12, after=12)",
+    "narrow_viewport_ok": true,
+    "status": "PASS"
+  },
+  {
+    "name": "hiring",
+    "url": "http://localhost:8503",
+    "console_errors": [],
+    "page_errors": [],
+    "title_found": true,
+    "has_content": true,
+    "plotly_charts_rendered": 12,
+    "metric_cards_rendered": 0,
+    "filter_widgets_found": 0,
+    "filter_interaction_ok": "radio_switched",
+    "narrow_viewport_ok": true,
+    "status": "PASS"
+  },
+  {
+    "name": "fraud",
+    "url": "http://localhost:8504",
+    "console_errors": [],
+    "page_errors": [],
+    "title_found": true,
+    "has_content": true,
+    "plotly_charts_rendered": 6,
+    "metric_cards_rendered": 8,
+    "filter_widgets_found": 3,
+    "filter_interaction_ok": "tag_removed (charts before=6, after=6)",
+    "narrow_viewport_ok": true,
+    "status": "PASS"
+  }
+]
