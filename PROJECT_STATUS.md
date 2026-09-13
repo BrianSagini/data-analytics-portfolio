@@ -1,6 +1,31 @@
 # Project Status
 
-Last updated: 2026-09-12 (end of build session). **All four projects complete and verified end-to-end.**
+Last updated: 2026-09-13 (Power BI + browser-testing + Git session). **All four projects complete
+and verified end-to-end; see `docs/final_verification_report.md` for the full PASS/FAIL/BLOCKED
+breakdown against every item in this project's definition of done.**
+
+## 2026-09-13 session additions
+
+- Added 13 `*.powerbi_*` read-only Postgres views (one set per project) and a new
+  `create_powerbi_views` Airflow task in each DAG. `docs/powerbi_guide.md` has exact Get
+  Data/measures/page-layout instructions for all 4 reports — Power BI Desktop is confirmed
+  installed, but building/testing the actual `.pbip` report interactively was not done (no
+  desktop-automation tool in this session); documented honestly as BLOCKED rather than faked.
+- Real browser testing of all 4 dashboards with Playwright/Chromium (`docs/browser_testing.md`),
+  replacing the previous "container started without error" level of verification. Found and
+  fixed one real gap (fraud dashboard had no filter widget at all) and one test-script timing bug
+  (dark store's charts were never actually missing, just not yet drawn at a too-short wait).
+- KPI reconciliation: SQL vs. Power BI view vs. Streamlit dashboard, spot-checked one KPI per
+  project — all matched exactly (they're the same underlying tables/views, so this is a
+  by-construction guarantee re-verified, not a coincidence).
+- `git init` + first commit (84+ files, `.env` and the raw UCI spreadsheet correctly excluded).
+  No GitHub remote configured (needs user-provided auth/repo).
+- **Docker Desktop crashed mid-session** (`docker ps` returned `500 Internal Server Error`,
+  confirmed zero `docker`-named processes running). Restarted it, waited for the engine, and
+  restarted this project's 4 dashboard containers (Postgres/Airflow auto-restarted on their own).
+  No data lost. This crash also caused that day's automatic `@daily` DAG runs to fail (confirmed
+  via `task_instance` — first task's network call failed right as the engine was unstable, not a
+  code bug); fixed by re-triggering all four manually once the stack was stable again.
 
 ## Environment & infrastructure
 

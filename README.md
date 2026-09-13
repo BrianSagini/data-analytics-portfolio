@@ -71,6 +71,52 @@ See `docs/environment_audit.md` (what already existed on this machine and why th
 own isolated Docker stack rather than reusing another project's Airflow) and `docs/architecture.md`
 (services, ports, executor choice, data flow, credential handling).
 
+## Power BI
+
+Each project's Postgres schema exposes read-only `*.powerbi_*` views (created by each DAG's
+`create_powerbi_views` task) specifically for Power BI — same underlying data as the Streamlit
+dashboards, so the two can never disagree. See `docs/powerbi_guide.md` for exact Get Data
+connection settings, tables, DAX measures, and page layouts per report, and an honest account of
+what was and wasn't verified (Power BI Desktop is installed and confirmed on this machine; a full
+interactive GUI build/test was not performed in this session — see that doc for why and what's
+left to do).
+
+## Browser testing
+
+All four dashboards were tested with a real headless-Chromium script
+(`scripts/browser_test_dashboards.py`, results in `docs/browser_testing.md` and
+`scripts/browser_test_screenshots/`) — not just "container started without error." Covers page
+load, chart/metric rendering, a real filter interaction, console/JS errors, and a narrow-viewport
+render.
+
+## Git / GitHub
+
+This repo is a local git repository with one initial commit; no GitHub remote is configured yet
+(that requires a GitHub account/repo this session has no authorization to create). To publish it:
+
+```bash
+gh repo create <name> --private --source=. --remote=origin   # or create one on github.com first
+git push -u origin master
+```
+
+## Troubleshooting
+
+- **Airflow apiserver crashes with `api_auth/jwt_secret must be set!`**: `AIRFLOW_FERNET_KEY` /
+  `AIRFLOW_JWT_SECRET` in `.env` are empty — generate real values (commands in Quick start above).
+- **`permission denied for schema public` during `airflow db migrate`**: only relevant if you
+  changed `database/init/01_init.sh` and recreated the `postgres_data` volume — Postgres 15+ no
+  longer grants `CREATE` on `public` to new roles by default; the init script already handles this.
+- **A dashboard shows "No data yet"**: its DAG hasn't completed a run yet — trigger it (see Quick
+  start) and wait; `dark_store_pipeline` in particular takes ~30-40 minutes end-to-end because it
+  parses a real ~45MB/541k-row spreadsheet.
+- **Docker Desktop itself becomes unresponsive (`500 Internal Server Error` from `docker ps`)**:
+  observed once during this build under heavy concurrent load from multiple unrelated Docker
+  Compose projects on the same machine; restarting Docker Desktop resolved it and no data was
+  lost (Postgres data lives in a named volume). If a dashboard/Airflow container exited during
+  such a crash and didn't auto-restart, `docker compose up -d` again.
+
 ## Status
 
-See `PROJECT_STATUS.md` for current build status, bugs found/fixed, and what's left.
+See `PROJECT_STATUS.md` for current build status, bugs found/fixed, and what's left, and
+`docs/final_verification_report.md` for the full PASS/FAIL/BLOCKED verification against every
+item in this project's definition of done.

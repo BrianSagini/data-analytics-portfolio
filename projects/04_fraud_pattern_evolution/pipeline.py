@@ -12,6 +12,7 @@ to check anomaly scores against at all.
 from __future__ import annotations
 
 import os
+from datetime import datetime, timezone
 
 import networkx as nx
 import numpy as np
@@ -233,6 +234,11 @@ def evaluate_model_and_load() -> dict:
         "f1": float(f1_score(y_true, y_pred, zero_division=0)),
         "roc_auc": float(roc_auc_score(y_true, df["raw_anomaly_score"])),
         "threshold": 0.5,
+        # upsert_dataframe only refreshes columns present in this dict on a
+        # rerun's ON CONFLICT UPDATE -- without this, computed_at would stay
+        # frozen at whatever the very first INSERT's DEFAULT now() set,
+        # silently misrepresenting every later rerun as the original run.
+        "computed_at": datetime.now(timezone.utc),
     }
     upsert_dataframe(pd.DataFrame([metrics]), schema="fraud_pattern", table="model_evaluation", key_columns=["model_name"])
     return metrics
