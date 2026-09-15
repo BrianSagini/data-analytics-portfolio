@@ -1,9 +1,9 @@
 table FairnessSummary
-	lineageTag: 1055f36d-a392-4bb5-b75a-761b053c4634
+	lineageTag: f55160f2-6614-4bbe-8afd-150352ac22e9
 
 	column group_attribute
 		dataType: string
-		lineageTag: 1ffa7a4f-9137-44d6-8c26-a1d2d31f82cc
+		lineageTag: e5a15c53-7012-499c-ae45-fcbeadcbeb06
 		summarizeBy: none
 		sourceColumn: group_attribute
 
@@ -11,7 +11,7 @@ table FairnessSummary
 
 	column group_value
 		dataType: string
-		lineageTag: e06a0d3e-270d-4db4-a45e-ade6c65b491f
+		lineageTag: b1a435b6-4148-4e87-92d9-2e3959acc7ba
 		summarizeBy: none
 		sourceColumn: group_value
 
@@ -19,7 +19,7 @@ table FairnessSummary
 
 	column stage
 		dataType: string
-		lineageTag: 602b6ec3-89fa-46bd-8f8b-6a64a9926fb4
+		lineageTag: 3cc2d255-3880-42ee-9a4d-624a7fc8dfcb
 		summarizeBy: none
 		sourceColumn: stage
 
@@ -27,7 +27,7 @@ table FairnessSummary
 
 	column total_at_risk
 		dataType: int64
-		lineageTag: 63e490d9-9d04-4431-a174-9d98ca31110b
+		lineageTag: 1720a282-fdb7-43ab-b5ea-b6b8af83975e
 		summarizeBy: none
 		formatString: #,0
 		sourceColumn: total_at_risk
@@ -36,7 +36,7 @@ table FairnessSummary
 
 	column passed
 		dataType: int64
-		lineageTag: 89cffa9f-a005-491f-9a19-a4758a3b55cd
+		lineageTag: f802ca96-51e6-4c47-ae8f-3d4d96872f41
 		summarizeBy: none
 		formatString: #,0
 		sourceColumn: passed
@@ -45,7 +45,7 @@ table FairnessSummary
 
 	column selection_rate
 		dataType: double
-		lineageTag: a446085d-e2eb-418b-890e-33c269b74ba9
+		lineageTag: d33955b2-f22a-46b3-a618-285f7b4447a6
 		summarizeBy: none
 		formatString: 0.00%
 		sourceColumn: selection_rate
@@ -54,7 +54,7 @@ table FairnessSummary
 
 	column reference_group
 		dataType: string
-		lineageTag: a98aa448-4661-40db-9a33-35896f3993a1
+		lineageTag: e03530d0-8f01-45bf-b304-96bab79ee698
 		summarizeBy: none
 		sourceColumn: reference_group
 
@@ -62,7 +62,7 @@ table FairnessSummary
 
 	column reference_selection_rate
 		dataType: double
-		lineageTag: b395eb8c-cf49-4c28-896b-45a7de077347
+		lineageTag: a1d62818-d493-49b3-9428-37998956fb68
 		summarizeBy: none
 		formatString: 0.00%
 		sourceColumn: reference_selection_rate
@@ -71,7 +71,7 @@ table FairnessSummary
 
 	column adverse_impact_ratio
 		dataType: double
-		lineageTag: 5734f5a1-d33c-48eb-8d50-06b69c875576
+		lineageTag: fabdcf3e-1669-4cd3-a196-7220078ddf6b
 		summarizeBy: none
 		formatString: 0.000
 		sourceColumn: adverse_impact_ratio
@@ -80,9 +80,9 @@ table FairnessSummary
 
 	column computed_at
 		dataType: dateTime
-		lineageTag: d43415a8-63d2-4fc0-bd8f-22d4a6c821b1
+		lineageTag: 34fcfb46-4eed-413c-b9ea-d6e0fba55a9b
 		summarizeBy: none
-		formatString: yyyy-mm-dd hh:mm:ss
+		formatString: yyyy-MM-dd hh:mm:ss
 		sourceColumn: computed_at
 
 		annotation SummarizationSetBy = Automatic

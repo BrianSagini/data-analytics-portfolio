@@ -1,9 +1,9 @@
 table GroupComparison
-	lineageTag: b32de90a-07c8-41d3-a31b-7ed92c151b5a
+	lineageTag: 905ecfcd-335e-4a8f-9382-aa3506076029
 
 	column group_attribute
 		dataType: string
-		lineageTag: cf536502-3623-4ad4-8874-b1ea2b81ced8
+		lineageTag: 2fdd7fd1-cf95-4455-9171-f0bead260bce
 		summarizeBy: none
 		sourceColumn: group_attribute
 
@@ -11,7 +11,7 @@ table GroupComparison
 
 	column group_value
 		dataType: string
-		lineageTag: b4008b89-7a32-4e60-812b-3d910739a113
+		lineageTag: e70f493e-2337-4e5a-9ecb-9b8f7f0c3357
 		summarizeBy: none
 		sourceColumn: group_value
 
@@ -19,7 +19,7 @@ table GroupComparison
 
 	column stage
 		dataType: string
-		lineageTag: 0e18c671-febb-43f8-88eb-ce960d4275bc
+		lineageTag: 398c2e06-1394-4975-a123-e2474582d72c
 		summarizeBy: none
 		sourceColumn: stage
 
@@ -27,7 +27,7 @@ table GroupComparison
 
 	column total_at_risk
 		dataType: int64
-		lineageTag: f0e47692-818c-49ac-a8f2-5972bde7dd01
+		lineageTag: 6a935219-1fee-4f65-a60b-81a0809867cf
 		summarizeBy: none
 		formatString: #,0
 		sourceColumn: total_at_risk
@@ -36,7 +36,7 @@ table GroupComparison
 
 	column passed
 		dataType: int64
-		lineageTag: 7ec41dc9-665f-4ff8-8d47-3d3f5d9e418e
+		lineageTag: 485972d2-16bd-4d63-a600-206fe7b96c98
 		summarizeBy: none
 		formatString: #,0
 		sourceColumn: passed
@@ -45,7 +45,7 @@ table GroupComparison
 
 	column selection_rate
 		dataType: double
-		lineageTag: 84a3bc7f-fffd-4d31-8129-d85638fb3969
+		lineageTag: 90453d66-35f3-4c09-b7b4-e5885ee78d5a
 		summarizeBy: none
 		formatString: 0.00%
 		sourceColumn: selection_rate
@@ -54,7 +54,7 @@ table GroupComparison
 
 	column reference_group
 		dataType: string
-		lineageTag: fb2ad641-0875-4de7-b618-ea49d02c411b
+		lineageTag: 6c1dce5f-b1ed-457c-8d4e-9ed32ce77831
 		summarizeBy: none
 		sourceColumn: reference_group
 
@@ -62,7 +62,7 @@ table GroupComparison
 
 	column reference_selection_rate
 		dataType: double
-		lineageTag: 6ad67800-dc17-4681-996b-7d3c482f580a
+		lineageTag: d48116f8-0322-417d-96dc-e80caf0035c4
 		summarizeBy: none
 		formatString: 0.00%
 		sourceColumn: reference_selection_rate
@@ -71,7 +71,7 @@ table GroupComparison
 
 	column adverse_impact_ratio
 		dataType: double
-		lineageTag: 4a317f17-c15b-430d-8a59-3cae7e2d039b
+		lineageTag: 8e805520-7029-48fb-b53b-8fb233550fef
 		summarizeBy: none
 		formatString: 0.000
 		sourceColumn: adverse_impact_ratio
@@ -80,7 +80,7 @@ table GroupComparison
 
 	column rate_difference
 		dataType: double
-		lineageTag: 6ea5c550-6faa-4fb7-99dd-4f003227364f
+		lineageTag: 239a66c8-79f3-4ff6-9f2a-fd85cf83bc06
 		summarizeBy: none
 		formatString: 0.00%
 		sourceColumn: rate_difference
@@ -89,7 +89,7 @@ table GroupComparison
 
 	column fails_four_fifths_rule
 		dataType: boolean
-		lineageTag: 75759e30-6f24-4228-a41c-430dc6eb2ee7
+		lineageTag: 2e67bdd4-80a8-488b-a0bd-41e36c24c7ed
 		summarizeBy: none
 		sourceColumn: fails_four_fifths_rule
 
@@ -97,7 +97,7 @@ table GroupComparison
 
 	measure 'Groups Failing 4/5ths Rule' = CALCULATE(DISTINCTCOUNT(GroupComparison[group_value]), GroupComparison[fails_four_fifths_rule] = TRUE)
 		formatString: 0
-		lineageTag: ed9f5dae-7079-41b0-a71f-5f94559afc73
+		lineageTag: 59f790ee-5b8f-4981-91ee-a6ed0aeadb20
 
 	partition GroupComparison = m
 		mode: import
