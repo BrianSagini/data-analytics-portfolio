@@ -58,13 +58,45 @@ Timeline, honestly, across four rounds:
      identical bug but happened to tolerate it, fixed anyway for consistency. Fraud's fresh Import
      -mode cache was empty on first open (expected for `.pbip` — no data ships with the file) and
      needed one explicit Refresh, which pulled 1 / 12 / 5,000 real rows from Postgres correctly.
+5. **Round 5 (this one)**: the project owner reported the rendered reports read as sparse with
+   unappealing flat backgrounds, and asked for tighter layouts, a real designed background, and
+   consolidation of any page left mostly empty. A whitespace audit (visual-area coverage per page,
+   computed from each `visual.json`'s position before touching anything) found every page in the
+   portfolio running 69–88% full except Fraud's, which ran 48–69% — the sparsest pages in the
+   portfolio, and the only ones with genuinely dead canvas space. Fixed in three parts:
+   - **Layout**: every page across all 4 projects was rebuilt onto a consistent dense grid (16px
+     canvas margin, 14px gutter between visuals, visuals resized to fill their row/column instead
+     of stopping short), taking every project to 85–88% canvas fill.
+   - **Backgrounds**: the round-3 canvas tint turned out not to actually be doing anything —
+     `visualStyles.*.*.outspace` (what round 3 used) is not the property that colors the report
+     page; confirmed by testing live in Desktop (View → Customize current theme → Page → Canvas
+     background, set a color, save, read back the JSON Desktop wrote) that the real property is
+     `visualStyles.page.*.background`. All 4 themes fixed; each project's canvas now visibly reads
+     as its own accent-tinted color rather than a near-white wash indistinguishable from the
+     Power BI default. The same live-Desktop method also confirmed cards need
+     `objects.labels[0].properties.color` rather than `dataPoint` for their own accent — a bug from
+     round 4 that had gone unnoticed because the affected cards still rendered, just in the wrong
+     (default) color.
+   - **Consolidation**: Fraud Pattern Evolution's 4 pages merged to 2. "Executive Overview" and
+     "Detection Performance" merged (they duplicated a table outright — byte-for-byte identical
+     field bindings — and a ROC AUC card) into one 7-card-plus-table page. "Fraud Trends" and
+     "Pattern & Network Analysis" merged into a 2×2 grid pairing time-series trend with network
+     pattern — a natural fit for a report literally named "Pattern Evolution." No other project
+     needed consolidation: their sparsest pages (69–83% full before this round) didn't have the
+     combination of genuine dead space and duplicated/thin content that justified a merge.
+   - Rebuilding `report.json` for Dark Store, Hiring, and Fraud (to add the new theme feature)
+     also surfaced that all three were on an older report schema version and missing a
+     `SharedResources` resourcePackage entry for the base theme — both silently tolerated before,
+     both now fixed by rebuilding from Climate's Desktop-proven-correct structure.
+   - All 4 projects reopened after every change and every page reconfirmed rendering correctly —
+     nothing the repositioning, retheming, or page merge touched broke a visual's data binding.
 
 | Project | Report name | Pages | Visuals (incl. header/footer) | Theme wired | Opened in Power BI Desktop | Final status |
 |---|---|---|---|---|---|---|
 | 1 | Climate Risk & Business Impact | 4 | 22 | Yes — `ClimateRiskTheme.json` | Yes — all 4 pages confirmed rendering | **COMPLETE** |
 | 2 | Dark Store Intelligence | 4 | 23 | Yes — `DarkStoreTheme.json` | Yes — all 4 pages confirmed rendering | **COMPLETE** |
 | 3 | AI Hiring Bias Detector | 4 | 20 | Yes — `HiringBiasTheme.json` | Yes — all 4 pages confirmed rendering | **COMPLETE** |
-| 4 | Fraud Pattern Evolution | 4 | 22 | Yes — `FraudPatternTheme.json` | Yes — all 4 pages confirmed rendering | **COMPLETE** |
+| 4 | Fraud Pattern Evolution | 2 (was 4) | 16 | Yes — `FraudPatternTheme.json` | Yes — both pages confirmed rendering | **COMPLETE** |
 
 Every project's `powerbi/0N_*/` copy in this monorepo was re-synced from its standalone repo
 after this round, so it carries the exact files that were confirmed rendering in Desktop (not a
@@ -89,7 +121,9 @@ margin off all four edges of every capture before saving, after one loading-stat
 found to have a sliver of unrelated window content bleed in at the bottom edge (deleted
 immediately, never committed). Every diagnostic/throwaway screenshot from this round was deleted
 before commit — only one clean, named screenshot per page was kept in each project's
-`docs/evidence/`.
+`docs/evidence/`. Round 5 reused the same hardened script throughout and it fired the
+foreground-mismatch abort correctly at least once more (Fraud's first capture attempt, when focus
+had shifted to a different window) — no file was written, and the capture was simply retried.
 
 ### Power BI Service publication
 
@@ -114,7 +148,7 @@ before commit — only one clean, named screenshot per page was kept in each pro
 | # | Item | Status |
 |---|---|---|
 | 1 | All safe code changes saved | **PASS** — `git status` clean before this audit began (see below) |
-| 2 | Four Power BI reports created & validated, or classified | **PASS** — real `.pbip` files for all 4 (full data model + measures + 22-23 visuals each), all 4 opened in Power BI Desktop and confirmed rendering correctly across all pages — see above |
+| 2 | Four Power BI reports created & validated, or classified | **PASS** — real `.pbip` files for all 4 (full data model + measures + 16-23 visuals each, Fraud consolidated to 2 pages), all 4 opened in Power BI Desktop and confirmed rendering correctly across all pages — see above |
 | 3 | Streamlit dashboards remain functional | **PASS** — re-checked 2026-09-15: all 4 `/_stcore/health` → `ok` |
 | 4 | Airflow DAGs remain functional | **PASS** — re-checked 2026-09-15: apiserver health endpoint reports metadatabase/scheduler/dag_processor all `healthy` |
 | 5 | PostgreSQL views remain functional | **PASS** — `pg_isready` OK; no schema changes made this phase (no new views were added, since no report was built against them) |
@@ -160,7 +194,7 @@ tracked files: zero matches.
 - Report 1 (Climate Risk): **COMPLETE** (real `.pbip`, all 4 pages confirmed rendering in Desktop)
 - Report 2 (Dark Store): **COMPLETE** (real `.pbip`, all 4 pages confirmed rendering in Desktop)
 - Report 3 (Hiring Bias): **COMPLETE** (real `.pbip`, all 4 pages confirmed rendering in Desktop)
-- Report 4 (Fraud Pattern): **COMPLETE** (real `.pbip`, all 4 pages confirmed rendering in Desktop)
+- Report 4 (Fraud Pattern): **COMPLETE** (real `.pbip`, consolidated to 2 pages this round, both confirmed rendering in Desktop)
 - Overall Power BI status: **COMPLETE** (real views + real `.pbip` data models/measures/visuals for
   all 4 reports; every page opened and confirmed rendering in Power BI Desktop)
 - Phase 14 items: **12 PASS · 0 FAIL · 2 BLOCKED · 0 NOT TESTED · 1 NOT APPLICABLE · 0 PARTIALLY COMPLETE**
