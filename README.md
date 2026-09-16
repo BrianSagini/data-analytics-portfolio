@@ -1,9 +1,11 @@
 # Data Analytics Portfolio
 
-Four end-to-end analytics projects sharing one Airflow + Postgres stack. Each project ingests
-real (or, where documented, honestly-labeled synthetic) data, validates and transforms it,
-loads it into Postgres, computes its analytics in SQL, and serves an interactive Streamlit
-dashboard.
+Four analytics projects, one shared Airflow + Postgres stack, a genuinely different problem in
+each: climate risk scoring, retail fulfillment economics, hiring-fairness auditing, and fraud
+detection with graph analytics. Every pipeline ingests data (real where I could get it, honestly
+labeled synthetic where I couldn't), validates and transforms it, loads it into Postgres, computes
+its analytics in SQL, and serves both a Streamlit dashboard and a Power BI report from the same
+underlying views.
 
 | # | Project | Data | Dashboard |
 |---|---|---|---|
@@ -12,123 +14,112 @@ dashboard.
 | 3 | [AI Hiring Bias Detector](projects/03_ai_hiring_bias_detector/) | 100% synthetic (documented bias injection) | http://localhost:8503 |
 | 4 | [Fraud Pattern Evolution Tracker](projects/04_fraud_pattern_evolution/) | 100% synthetic (documented fraud-ring injection) | http://localhost:8504 |
 
-See `docs/data_sources.md` for exactly what's real vs. synthetic in each project, and each
-project's `docs/methodology_*.md` for formulas, assumptions, and explicit limitations.
+Each is also published as its own self-contained repo if you want to see one in isolation:
+[climate-risk-business-impact-analyzer](https://github.com/BrianSagini/climate-risk-business-impact-analyzer),
+[dark-store-intelligence-dashboard](https://github.com/BrianSagini/dark-store-intelligence-dashboard),
+[ai-hiring-bias-detector](https://github.com/BrianSagini/ai-hiring-bias-detector),
+[fraud-pattern-evolution-tracker](https://github.com/BrianSagini/fraud-pattern-evolution-tracker).
+This repo is where I actually built and ran them together, sharing one Airflow instance.
 
-## Quick start
+See `docs/data_sources.md` for exactly what's real vs. synthetic in each project, and each
+project's `docs/methodology_*.md` for formulas, assumptions, and limitations I want a reader to
+know about, not just the results.
+
+## Running it
 
 ```bash
 cp .env.example .env
-# generate real secrets before first run -- Airflow 3's apiserver refuses to start without them:
+# Airflow 3's apiserver won't start without real secrets here -- generate them first:
 python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"   # -> AIRFLOW_FERNET_KEY
 python -c "import secrets; print(secrets.token_urlsafe(32))"                                 # -> AIRFLOW_JWT_SECRET
 # paste both into .env
 
 docker compose up -d --build postgres airflow-init airflow-apiserver airflow-scheduler airflow-dag-processor
-docker compose ps   # confirm airflow-init exited 0, others healthy/starting
+docker compose ps   # airflow-init should exit 0, everything else healthy/starting
 ```
 
-Airflow UI: http://localhost:8081 (`admin` / whatever `AIRFLOW_ADMIN_PASSWORD` you set in `.env`).
-
-Unpause and run a pipeline:
+Airflow's at http://localhost:8081. From there, or the CLI:
 
 ```bash
 docker compose exec airflow-scheduler airflow dags unpause climate_risk_pipeline
 docker compose exec airflow-scheduler airflow dags trigger climate_risk_pipeline
-docker compose exec airflow-scheduler airflow dags list-runs climate_risk_pipeline
 ```
 
-DAG ids: `climate_risk_pipeline`, `dark_store_pipeline`, `hiring_bias_pipeline`, `fraud_pattern_pipeline`.
-
-Start a dashboard once its DAG has completed at least one run:
+DAG ids: `climate_risk_pipeline`, `dark_store_pipeline`, `hiring_bias_pipeline`,
+`fraud_pattern_pipeline`. Once a DAG's completed at least one run, bring up its dashboard:
 
 ```bash
-docker compose up -d --build dashboard-climate     # http://localhost:8501
-docker compose up -d --build dashboard-darkstore    # http://localhost:8502
-docker compose up -d --build dashboard-hiring       # http://localhost:8503
-docker compose up -d --build dashboard-fraud        # http://localhost:8504
+docker compose up -d --build dashboard-climate     # :8501
+docker compose up -d --build dashboard-darkstore    # :8502
+docker compose up -d --build dashboard-hiring       # :8503
+docker compose up -d --build dashboard-fraud        # :8504
 ```
 
-Shut down (keeps data):
+`docker compose down` shuts everything down without touching the data.
 
-```bash
-docker compose down
-```
-
-## Repository layout
+## How it's laid out
 
 ```
 airflow/dags/            one DAG per project
 database/init/           first-boot Postgres bootstrap (roles, schemas)
 shared/                  ingestion/validation/database helpers used by every DAG
 projects/0N_*/           each project's pipeline.py, sql/, dashboard/app.py, data_raw/
-docs/                    environment audit, architecture, data sources, methodology per project
+powerbi/0N_*/            each project's .pbip report, mirrored from its standalone repo
+docs/                    architecture notes, data sourcing, methodology, build log
 ```
 
-## Why this architecture
-
-See `docs/environment_audit.md` (what already existed on this machine and why this repo gets its
-own isolated Docker stack rather than reusing another project's Airflow) and `docs/architecture.md`
-(services, ports, executor choice, data flow, credential handling).
+I isolated this whole stack deliberately — its own Postgres, its own Airflow, ports chosen to
+avoid clashing with anything else already running on the machine I built this on. The reasoning
+(what else was already running, why I didn't reuse it, service/port/executor choices) is in
+`docs/environment_audit.md` and `docs/architecture.md`.
 
 ## Power BI
 
-Each project's Postgres schema exposes read-only `*.powerbi_*` views (created by each DAG's
-`create_powerbi_views` task) specifically for Power BI — same underlying data as the Streamlit
-dashboards, so the two can never disagree.
-
-Real `.pbip` project files (full data model, relationships, and DAX measures — pages present but
-with no visuals yet) exist for all four reports, generated by `scripts/gen_pbip.py`:
+Every project's Postgres schema exposes read-only `*.powerbi_*` views — the same underlying data
+the Streamlit dashboards read, so the two can never disagree. On top of those, I hand-built a
+complete Power BI report per project: real semantic models (tables, relationships, DAX measures
+checked field-by-field against the SQL), a themed design (a tinted canvas per project's own
+accent palette, dense grids instead of visuals floating in half-empty pages, semantic accent
+colors — red for risk, green for revenue, amber for warnings), and I opened every page of every
+report in Power BI Desktop myself and confirmed it renders with real data before calling any of it
+done. Screenshots are in each project's `docs/evidence/`.
 
 ```
-powerbi/01_climate_risk_business_impact/ClimateRisk.pbip
-powerbi/02_dark_store_intelligence/DarkStoreIntelligence.pbip
-powerbi/03_ai_hiring_bias_detector/HiringBiasDetector.pbip
-powerbi/04_fraud_pattern_evolution/FraudPatternEvolution.pbip
+powerbi/01_climate_risk_business_impact/ClimateRisk.pbip           4 pages, 22 visuals
+powerbi/02_dark_store_intelligence/DarkStoreIntelligence.pbip      4 pages, 23 visuals
+powerbi/03_ai_hiring_bias_detector/HiringBiasDetector.pbip         4 pages, 20 visuals
+powerbi/04_fraud_pattern_evolution/FraudPatternEvolution.pbip      2 pages, 16 visuals
 ```
 
-**None of these has been opened in Power BI Desktop, so none is validated** — open one to find
-out whether it loads cleanly. See `docs/powerbi_guide.md` for exact connection settings, the full
-design system (colors/typography), page-by-page layout instructions, and a completely honest
-account of what was and wasn't verified (including why: a screenshot-based validation attempt was
-stopped after it captured unrelated live-desktop content — see `docs/final_release_audit_report.md`).
+Fraud's report is 2 pages instead of 4 — I originally split it the same way as the others, found
+two of those pages duplicated a table and a card outright, and merged them rather than leave the
+duplication in. Full design reasoning and page-by-page detail live in each project's own repo
+(linked at the top) under `docs/powerbi_guide.md`; the story of how I actually got here across all
+four — the real bugs, the wrong assumptions I had to correct — is in `docs/how_i_built_this.md`.
 
-## Browser testing
+## Everything else I verified
 
-All four dashboards were tested with a real headless-Chromium script
-(`scripts/browser_test_dashboards.py`, results in `docs/browser_testing.md` and
-`scripts/browser_test_screenshots/`) — not just "container started without error." Covers page
-load, chart/metric rendering, a real filter interaction, console/JS errors, and a narrow-viewport
-render.
+Real Airflow runs, real headless-browser testing of all four dashboards, and a KPI reconciliation
+that traces one number per project through SQL → Power BI view → live dashboard and checks they
+agree exactly — plus the real bugs that surfaced along the way and how I fixed them. All of that
+is in `docs/how_i_built_this.md` rather than kept as a separate pass/fail audit log.
 
-## Git / GitHub
-
-This repo is a local git repository with one initial commit; no GitHub remote is configured yet
-(that requires a GitHub account/repo this session has no authorization to create). To publish it:
-
-```bash
-gh repo create <name> --private --source=. --remote=origin   # or create one on github.com first
-git push -u origin master
-```
-
-## Troubleshooting
+## If something breaks
 
 - **Airflow apiserver crashes with `api_auth/jwt_secret must be set!`**: `AIRFLOW_FERNET_KEY` /
-  `AIRFLOW_JWT_SECRET` in `.env` are empty — generate real values (commands in Quick start above).
-- **`permission denied for schema public` during `airflow db migrate`**: only relevant if you
-  changed `database/init/01_init.sh` and recreated the `postgres_data` volume — Postgres 15+ no
-  longer grants `CREATE` on `public` to new roles by default; the init script already handles this.
-- **A dashboard shows "No data yet"**: its DAG hasn't completed a run yet — trigger it (see Quick
-  start) and wait; `dark_store_pipeline` in particular takes ~30-40 minutes end-to-end because it
-  parses a real ~45MB/541k-row spreadsheet.
-- **Docker Desktop itself becomes unresponsive (`500 Internal Server Error` from `docker ps`)**:
-  observed once during this build under heavy concurrent load from multiple unrelated Docker
-  Compose projects on the same machine; restarting Docker Desktop resolved it and no data was
-  lost (Postgres data lives in a named volume). If a dashboard/Airflow container exited during
-  such a crash and didn't auto-restart, `docker compose up -d` again.
+  `AIRFLOW_JWT_SECRET` are empty in `.env` — generate real values (see Running it above).
+- **`permission denied for schema public` during `airflow db migrate`**: only comes up if you
+  changed `database/init/01_init.sh` and recreated the `postgres_data` volume — Postgres 15+
+  stopped granting `CREATE` on `public` by default; the init script already handles it.
+- **A dashboard shows "No data yet"**: its DAG hasn't completed a run — trigger it and wait;
+  Dark Store in particular takes 30–40 minutes because it parses a real ~45MB spreadsheet.
 
-## Status
+## Git
 
-See `PROJECT_STATUS.md` for current build status, bugs found/fixed, and what's left, and
-`docs/final_verification_report.md` for the full PASS/FAIL/BLOCKED verification against every
-item in this project's definition of done.
+This repo stays local-only by design — no GitHub remote — since each project is published
+independently (see the links at the top). If you want to push it anyway:
+
+```bash
+gh repo create <name> --private --source=. --remote=origin
+git push -u origin master
+```
