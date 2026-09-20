@@ -23,3 +23,7 @@ projects/*/data_raw/*
 **/*.pbix
 **/CachedData/
 **/*.abf
+
+# Standalone repos relocated here each carry their own .git and their own
+# GitHub remote -- this repo's git must not track them as regular files.
+standalone-repos/
