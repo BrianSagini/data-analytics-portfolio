@@ -7,6 +7,14 @@ docs/methodology_dark_store.md.
 """
 from __future__ import annotations
 
+import os
+import sys
+
+# Streamlit Community Cloud runs this file directly from its own location
+# with no PYTHONPATH set (unlike docker-compose locally), so the repo root
+# -- where shared/ lives -- isn't on sys.path without this.
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
