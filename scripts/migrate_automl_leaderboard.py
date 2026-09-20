@@ -23,9 +23,8 @@ repo), e.g.:
 
     ANALYTICS_DATABASE_URL="postgresql://..." python scripts/migrate_automl_leaderboard.py
 
-Not part of any DAG -- the three projects' automl_leaderboard tables are
-static snapshots of one AutoML run each, not something a recurring pipeline
-recomputes.
+Not part of any DAG -- each project's automl_leaderboard table is a static
+snapshot of one AutoML run, not something a recurring pipeline recomputes.
 """
 from __future__ import annotations
 
@@ -65,6 +64,11 @@ PROJECTS = {
         "repo_dir": os.path.join(REPOS_DIR, "dark-store-intelligence-dashboard"),
         "notebook": "demand_forecast_model.ipynb",
         "leaderboard_cell_index": 30,
+    },
+    "hiring_bias": {
+        "repo_dir": os.path.join(REPOS_DIR, "ai-hiring-bias-detector"),
+        "notebook": "hiring_bias_model_comparison.ipynb",
+        "leaderboard_cell_index": 28,
     },
 }
 
