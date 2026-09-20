@@ -9,10 +9,10 @@ underlying views.
 
 | # | Project | Data | Dashboard |
 |---|---|---|---|
-| 1 | [Climate Risk & Business Impact](projects/01_climate_risk_business_impact/) | Real (Open-Meteo) + synthetic business exposure | http://localhost:8501 |
-| 2 | [Dark Store Intelligence](projects/02_dark_store_intelligence/) | Real (UCI Online Retail II) + synthetic store/inventory | http://localhost:8502 |
-| 3 | [AI Hiring Bias Detector](projects/03_ai_hiring_bias_detector/) | 100% synthetic (documented bias injection) | http://localhost:8503 |
-| 4 | [Fraud Pattern Evolution Tracker](projects/04_fraud_pattern_evolution/) | 100% synthetic (documented fraud-ring injection) | http://localhost:8504 |
+| 1 | [Climate Risk & Business Impact](projects/01_climate_risk_business_impact/) | Real (Open-Meteo) + synthetic business exposure | [Live dashboard](https://climate-risk-business-impact.streamlit.app/) |
+| 2 | [Dark Store Intelligence](projects/02_dark_store_intelligence/) | Real (UCI Online Retail II) + synthetic store/inventory | [Live dashboard](https://dark-store-intelligence.streamlit.app/) |
+| 3 | [AI Hiring Bias Detector](projects/03_ai_hiring_bias_detector/) | 100% synthetic (documented bias injection) | [Live dashboard](https://ai-hiring-bias-detector.streamlit.app/) |
+| 4 | [Fraud Pattern Evolution Tracker](projects/04_fraud_pattern_evolution/) | 100% synthetic (documented fraud-ring injection) | [Live dashboard](https://fraud-pattern-evolution.streamlit.app/) |
 
 Each is also published as its own self-contained repo if you want to see one in isolation:
 [climate-risk-business-impact-analyzer](https://github.com/BrianSagini/climate-risk-business-impact-analyzer),
