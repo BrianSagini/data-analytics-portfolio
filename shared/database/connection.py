@@ -5,6 +5,18 @@ pointed at the container-internal ``postgres`` service) rather than
 hardcoding host/credentials, so the same code works whether it runs inside
 an Airflow task container or a local `python -m` invocation with `.env`
 loaded some other way.
+
+On Streamlit Community Cloud there is no .env/docker-compose, so
+_resolve_database_url() also checks st.secrets["postgres"]["url"] first --
+each app's Settings -> Secrets holds a TOML block pointing at the shared
+Neon database:
+
+    [postgres]
+    url = "postgresql://..."
+
+Streamlit isn't installed in the Airflow task containers, so the import is
+attempted lazily and any failure just falls through to the existing
+env-var path unchanged.
 """
 from __future__ import annotations
 
@@ -15,9 +27,26 @@ import pandas as pd
 from sqlalchemy import Engine, create_engine, text
 
 
+def _resolve_database_url() -> str:
+    try:
+        import streamlit as st
+
+        url = st.secrets["postgres"]["url"]
+    except Exception:  # noqa: BLE001 -- no streamlit, no secrets.toml, no [postgres] table: fall back
+        pass
+    else:
+        # Neon's sslmode=require/channel_binding=require query params pass
+        # through to psycopg2/libpq unchanged; only the driver prefix needs
+        # normalizing so SQLAlchemy resolves the same dialect as the local URL.
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+psycopg2://", 1)
+        return url
+    return os.environ["ANALYTICS_DATABASE_URL"]
+
+
 @lru_cache(maxsize=1)
 def get_engine() -> Engine:
-    url = os.environ["ANALYTICS_DATABASE_URL"]
+    url = _resolve_database_url()
     return create_engine(url, pool_pre_ping=True, future=True)
 
 
