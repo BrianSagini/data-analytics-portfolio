@@ -113,13 +113,3 @@ is in `docs/how_i_built_this.md` rather than kept as a separate pass/fail audit 
   stopped granting `CREATE` on `public` by default; the init script already handles it.
 - **A dashboard shows "No data yet"**: its DAG hasn't completed a run — trigger it and wait;
   Dark Store in particular takes 30–40 minutes because it parses a real ~45MB spreadsheet.
-
-## Git
-
-This repo stays local-only by design — no GitHub remote — since each project is published
-independently (see the links at the top). If you want to push it anyway:
-
-```bash
-gh repo create <name> --private --source=. --remote=origin
-git push -u origin master
-```
